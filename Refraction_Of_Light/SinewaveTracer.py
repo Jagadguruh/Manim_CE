@@ -20,6 +20,19 @@ class SinewaveTracer(Scene):
         trail = TracedPath(red_dot.get_center)
         trail.set_color(RED)
 
-        self.add(axes, labels, red_dot, trail)
+        # New dot at origin
+        origin_dot = Dot(color=BLUE)
+        origin_dot.add_updater(lambda m: m.move_to(axes.c2p(0, np.sin(x_tracker.get_value()))))
+        origin_trail = TracedPath(origin_dot.get_center)
+        origin_trail.set_color(BLUE)
+
+        # Timer
+        time_label = DecimalNumber(0, num_decimal_places=2).add_updater(lambda t: t.set_value(x_tracker.get_value()))
+        time_label.scale(2)  # scale the timer
+        time = VGroup(Text("Time:"), time_label).arrange(RIGHT).to_corner(UR)  
+
+        # Add the timer to the scene
+        self.add(axes, labels, red_dot, trail, origin_dot, origin_trail, time)
         self.play(x_tracker.animate.set_value(4*np.pi), run_time=20, rate_func=linear)
+        origin_dot.clear_updaters()
         red_dot.clear_updaters()
